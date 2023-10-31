@@ -2,11 +2,13 @@ package com.cms.course.management.system.controller;
 import com.cms.course.management.system.contract.CourseRequest;
 import com.cms.course.management.system.model.Courses;
 import com.cms.course.management.system.service.CourseService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
 import java.util.ArrayList;
@@ -15,6 +17,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
@@ -48,8 +51,10 @@ public class CourseControllerTest {
         courses.setId(1L);
         courses.setFirstName("Maths");
         courses.setLastName("Engineering");
-        when(courseService.getCourseById(courses.getId())).thenReturn(courses);
+        Long id=1L;
+        when(courseService.getCourseById(id)).thenReturn(courses);
         mockMvc.perform(get("/courses/1")).andExpect(status().isOk());
+
     }
 
     @Test
@@ -82,9 +87,19 @@ public class CourseControllerTest {
         courseRequest.setFirstName("Maths");
         courseRequest.setLastName("Engineering");
         when(courseService.updateCourse(1L, courseRequest)).thenReturn(true);
-        mockMvc.perform(put("/products/1"))
+        ObjectMapper objectMapper = new ObjectMapper();
+        String request = objectMapper.writeValueAsString(courseRequest);
+        mockMvc.perform(put("/courses/1")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(request))
+                .andDo(print())
                 .andExpect(status().isOk());
+
     }
+
+
+
+
 
 
 

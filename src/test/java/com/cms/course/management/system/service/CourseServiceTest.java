@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 
 
 import java.util.ArrayList;
@@ -14,17 +16,18 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class CourseServiceTest {
- private CourseService courseService;
-  private CourseRepository courseRepository;
+ private   CourseService courseService;
+ private CourseRepository courseRepository;
 
     @BeforeEach
-    public void init(){
+    public void init() {
         MockitoAnnotations.openMocks(this);
-        courseRepository = Mockito.mock(courseRepository.class);
-        courseRepository = new courseService(courseRepository);
+        courseRepository=Mockito.mock(CourseRepository.class);
+        courseService = new CourseService(courseRepository);
     }
 
     @Test
@@ -64,14 +67,14 @@ public class CourseServiceTest {
         courses.setLastName("Engineering");
         when(courseRepository.save(courses)).thenReturn(courses);
         Courses id = courseService.addCourse(courses);
-        assertEquals(id,1L);
+        assertEquals(id.getId(),1L);
     }
 
 
 
 
     @Test
-    void testDeleteProduct(){
+    void testDeleteCourse(){
         Courses courses = new Courses();
         courses.setId(1L);
         courses.setFirstName("Maths");
@@ -80,4 +83,22 @@ public class CourseServiceTest {
         Boolean item = courseService.deleteCourse(1L);
         Mockito.verify(courseRepository).deleteById(1L);
     }
+
+    @Test
+    void testUpdateCourse(){
+        Long id=1L;
+        CourseRequest courseRequest=new CourseRequest();
+        courseRequest.setFirstName("Maths");
+        Courses courses=new Courses();
+        courses.setFirstName("Maths");
+        when(courseRepository.findById(1L)).thenReturn(Optional.of(courses));
+        when(courseRepository.save(courses)).thenReturn(courses);
+        Boolean item = courseService.updateCourse(1L,courseRequest);
+        Mockito.verify(courseRepository).save(courses);
+
+
+
+
+    }
+
 }
